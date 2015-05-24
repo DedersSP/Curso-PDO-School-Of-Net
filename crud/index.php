@@ -7,6 +7,8 @@
  * Criando um arquivo SQL
  */
 
+require_once 'Aluno.class.php';
+
 try{
     $conexao = new PDO("mysql:host=localhost;dbname=teste", "root", "deders");
     $conexao->setAttribute(PDO::MYSQL_ATTR_INIT_COMMAND, 'SET NAMES utf8');
@@ -82,24 +84,43 @@ $stmt->execute();*/
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">PDO CRUD | School Of Net</a>
+                <a class="navbar-brand" href="">PDO CRUD | School Of Net</a>
             </div>
+            <div id="navbar" class="collapse navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="index.php">Home</a></li>
+                    <li><a href="index.php?cadastrar">Cadastrar Aluno</a></li>
+                </ul>
+            </div><!--/.nav-collapse -->
         </div>
     </nav>
 
     <div class="container">
-        <h3>Cadastrar Alunos</h3>
-        <form class="form-inline has-error has-feedback"><!--Form Cadastrar-->
-            <div class="form-group">
-                <label for="exampleInputName2">Nome</label>
-                <input type="text" class="form-control" name="nome" id="nome" placeholder="Informe Nome Completo" required="true">
-            </div>
-            <div class="form-group">
-                <label for="exampleInputEmail2">Nota</label>
-                <input type="number" class="form-control" name="nota" id="nota" placeholder="Informe a nota do aluno" required="true">
-            </div>
-            <button type="submit" class="btn btn-default" name="cadastrar">Cadastrar</button>
-        </form>
+        <?php
+            if (isset($_GET["cadastrar"])){
+                include 'cadastrar.php';
+            }
+        ?>
+
+        <?php
+        if (isset($_GET["editar?id"]) > 0){
+            include 'editar.php';
+        }
+
+        if (isset($_GET["editarmsg"])){
+            echo '<p class="bg-success">Alteração realizada com Sucesso!</p>';
+        }
+        ?>
+
+        <?php
+            $aluno = new Aluno($conexao);
+            if (isset($_GET['delete']) > 0){
+                $aluno->deletar($_GET['delete']);
+                echo '<p class="bg-success">Aluno Excluido com Sucesso!</p>';
+            }
+        ?>
+
+
     </div>
 
 
@@ -114,14 +135,19 @@ $stmt->execute();*/
             <th style="text-align: center">Nota</th>
             <th style="text-align: center">Editar</th>
             </tr>
-            <tr>
-                <td>1</td>
-                <td>André Batista</td>
-                <td style="text-align: center">10</td>
-                <td style="text-align: center">Editar | Excluir</td>
-            </tr>
-        </table>
+            <?php
+                foreach ($aluno->listar() as $key){
+                    echo "<tr>";
+                    echo "<td>".$key['idalunos']."</td>";
+                    echo "<td>".$key['nomealuno']."</td>";
+                    echo "<td style='text-align: center'>".$key['notaaluno']."</td>";
+                    echo "<td style='text-align: center'> <a href='index.php?editar?id=".$key['idalunos']."'>Editar</a> | <a href='index.php?delete=".$key['idalunos']."'>Excluir</a></td>";
+                    echo "</tr>";
+                }
+            ?>
 
+
+        </table>
     </div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
