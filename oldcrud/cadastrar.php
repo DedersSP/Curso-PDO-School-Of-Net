@@ -7,11 +7,11 @@
  */
 
 if (isset($_POST['cadastrar'])){
-    $aluno = new Aluno();
+    echo "Entrou";
+    $aluno = new Aluno($conexao);
     $aluno->setNome($_POST['nome'])->setNota($_POST['nota']);
-    $servicedb = new ServiceDb($conexao, $aluno);
-    if ($servicedb->inserir()){
-        echo '<p class="bg-success">Aluno(a) '.$aluno->getNome().' Cadastrado com Sucesso!</p>';
+    if ($aluno->inserir()){
+        header("Location: index.php?msg=insertmsg");
     }
 }
 ?>

@@ -8,8 +8,6 @@
  */
 
 require_once 'Aluno.class.php';
-require_once 'ServiceDb.class.php';
-
 
 try{
     $conexao = new PDO("mysql:host=localhost;dbname=teste", "root", "deders");
@@ -91,7 +89,7 @@ $stmt->execute();*/
             <div id="navbar" class="collapse navbar-collapse">
                 <ul class="nav navbar-nav">
                     <li class="active"><a href="index.php">Home</a></li>
-                    <li><a href="index.php?cadastrar">Cadastrar Aluno</a></li>
+                    <li><a href="?page=cadastrar">Cadastrar Aluno</a></li>
                 </ul>
             </div><!--/.nav-collapse -->
         </div>
@@ -99,31 +97,37 @@ $stmt->execute();*/
 
     <div class="container">
         <?php
-            if (isset($_GET["cadastrar"])){
+            if (filter_input(INPUT_GET,'page') == 'cadastrar'){
                 include 'cadastrar.php';
             }
         ?>
 
         <?php
-        if (isset($_GET["editar?id"]) > 0){
-            include 'editar.php';
-        }
-
-        if (isset($_GET["editarmsg"])){
-            echo '<p class="bg-success">Alteração realizada com Sucesso!</p>';
-        }
-        ?>
-
-        <?php
-            $aluno = new Aluno();
-            $servicedb = new ServiceDb($conexao, $aluno);
-            if (isset($_GET['delete']) > 0){
-                $servicedb->deletar($_GET['delete']);
-                echo '<p class="bg-success">Aluno Excluido com Sucesso!</p>';
+            if (filter_input(INPUT_GET,'page') == 'editar'){
+                include 'editar.php';
             }
         ?>
 
+        <?php
+            $msg = filter_input(INPUT_GET, 'msg');
+            switch ($msg) {
+                case 'editmsg':
+                    echo '<p class="bg-success">Alteração realizada com Sucesso!</p>';
+                    break;
+                case 'insertmsg':
+                    echo '<p class="bg-success">Aluno(a) cadastrado com Sucesso!</p>';
+                    break;
+            }
+        ?>
 
+        <?php
+            $aluno = new Aluno($conexao);
+            if (filter_input(INPUT_GET,'page') == 'delete' and filter_input(INPUT_GET,'id') > 0){
+                $id = filter_input(INPUT_GET,'id');
+                $aluno->deletar($id);
+                echo '<p class="bg-success">Aluno Excluido com Sucesso!</p>';
+            }
+        ?>
     </div>
 
 
@@ -139,12 +143,12 @@ $stmt->execute();*/
             <th style="text-align: center">Editar</th>
             </tr>
             <?php
-                foreach ($servicedb->listar() as $key){
+                foreach ($aluno->listar() as $key){
                     echo "<tr>";
                     echo "<td>".$key['idalunos']."</td>";
                     echo "<td>".$key['nomealuno']."</td>";
                     echo "<td style='text-align: center'>".$key['notaaluno']."</td>";
-                    echo "<td style='text-align: center'> <a href='index.php?editar?id=".$key['idalunos']."'>Editar</a> | <a href='index.php?delete=".$key['idalunos']."'>Excluir</a></td>";
+                    echo "<td style='text-align: center'> <a href='?page=editar&id=".$key['idalunos']."'>Editar</a> | <a href='?page=delete&id=".$key['idalunos']."'>Excluir</a></td>";
                     echo "</tr>";
                 }
             ?>

@@ -5,15 +5,14 @@
  * Date: 23/05/15
  * Time: 01:29
  */
-    $aluno = new Aluno();
-    $id = $_GET["editar?id"];
-    $servicedb = new ServiceDb($conexao, $aluno);
-    $result = $servicedb->findById($id);
+    $aluno = new Aluno($conexao);
+    $id = filter_input(INPUT_GET,'id');
+    $result = $aluno->findById($id);
 
     if (isset($_POST['editar'])){
         $aluno->setId($_POST['id'])->setNome($_POST['nome'])->setNota($_POST['nota']);
-        if ($servicedb->alterar()){
-            header("Location: index.php?editarmsg");
+        if ($aluno->alterar()){
+            header("Location: index.php?msg=editmsg");
         }
     }
 ?>
